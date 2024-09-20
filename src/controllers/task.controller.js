@@ -178,9 +178,6 @@ const importTasks = asyncHandler(async (req, res) => {
   try {
     const tasks = await readCSVFile(filePath);
 
-    // Log the parsed tasks
-    console.log("Parsed tasks:", tasks);
-
     // Convert isCompleted and map user names to ObjectId
     const formattedTasks = await Promise.all(
       tasks.map(async (task) => {
