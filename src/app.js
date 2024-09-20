@@ -3,7 +3,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { userRouter } from "./routers/user.router.js";
 import { taskRouter } from "./routers/task.router.js";
-
 import admin from "firebase-admin";
 
 // Firebase Admin SDK configuration
