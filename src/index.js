@@ -3,7 +3,6 @@ import connectDB from "./db/db.js";
 import { app } from "./app.js";
 import { createServer } from "http"; // Import HTTP server creation method
 import { Server } from "socket.io"; // Import socket.io server
-import cronJobs from "./services/cronJob.js";
 
 dotenv.config({ path: "./.env" });
 
