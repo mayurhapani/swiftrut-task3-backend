@@ -148,30 +148,26 @@ const updateFcmToken = asyncHandler(async (req, res) => {
     throw new ApiError(400, "FCM token is required");
   }
 
-  if (!userId) {
-    throw new ApiError(401, "User not authenticated");
-  }
+  const updatedUser = await userModel
+    .findByIdAndUpdate(userId, { fcmToken }, { new: true })
+    .select("-password");
 
-  const user = await userModel.findById(userId);
-  if (!user) {
+  if (!updatedUser) {
     throw new ApiError(404, "User not found");
   }
 
-  user.fcmToken = fcmToken;
-  await user.save();
-
   return res
     .status(200)
-    .json(new ApiResponse(200, fcmToken, "FCM token updated successfully"));
+    .json(new ApiResponse(200, updatedUser, "FCM token updated successfully"));
 });
 
 export {
   registerUser,
-  deleteUser,
-  updateUser,
   login,
   logout,
   getUser,
   getAllUsers,
+  updateUser,
+  deleteUser,
   updateFcmToken,
 };

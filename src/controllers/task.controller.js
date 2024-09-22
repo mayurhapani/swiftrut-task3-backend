@@ -3,15 +3,13 @@ import { userModel } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendTaskNotification } from "..//helpers/firebaseAdmin.js";
 
 //new
-import fs from "fs";
 import path from "path";
-import csvParser from "csv-parser";
 import fastCsv from "fast-csv";
 import { fileURLToPath } from "url";
 import { readCSVFile, deleteFile } from "../helpers/fileHelper.js";
-import { insertTasks } from "../services/taskService.js";
 // import { parse as json2csv } from "json2csv";
 
 // ES modules equivalent of __dirname
@@ -36,21 +34,22 @@ const addTask = asyncHandler(async (req, res) => {
   });
 
   if (!newTask) {
-    throw new ApiError(500, "something went wrong while adding task");
+    throw new ApiError(500, "Something went wrong while adding task");
   }
 
-  // Retrieve the user's FCM token from userModel
-  const user = await userModel.findById(userId);
-
-  if (user && user.fcmToken) {
-    // Send notification using the user's FCM token
-    sendTaskNotification(
-      user.fcmToken,
-      "Task Assigned",
-      "A new task has been assigned to you."
-    );
-  } else {
-    console.warn("No FCM token found for the user");
+  // Send notification to assigned user
+  const assignedUser = await userModel.findById(assignTo);
+  if (assignedUser && assignedUser.fcmToken) {
+    try {
+      await sendTaskNotification(
+        assignedUser.fcmToken,
+        "New Task Assigned",
+        `You have been assigned a new task: ${title}`
+      );
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      // Continue execution even if notification fails
+    }
   }
 
   return res
